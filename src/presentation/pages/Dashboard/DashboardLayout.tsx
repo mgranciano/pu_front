@@ -13,8 +13,10 @@ import {
   Box,
   Button,
 } from "@mui/material";
-import { Menu, Home, Person, Settings } from "@mui/icons-material";
+import { Menu, Home, Person, Settings, Logout } from "@mui/icons-material"; // 🔹 Importamos Logout
 import { styled } from "@mui/material/styles";
+import { useNavigate } from "react-router-dom"; // 🔹 Importamos useNavigate
+import { useAuth } from "../../../application/hooks/useAuth";
 
 const drawerWidth = 280;
 
@@ -50,35 +52,42 @@ const Main = styled(Box)<{ open: boolean }>`
   padding: 16px;
   background: white;
   transition: margin 0.3s ease-in-out;
-  margin-left: ${(props) => (props.open ? `${drawerWidth}px` : "65px")};
+  margin-left: ${(props) => (props.open ? `${drawerWidth}px}` : "65px")};
 `;
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [open, setOpen] = useState(false);
+  const { logout } = useAuth(); // 🔹 Usamos la función logout de useAuth
+  const navigate = useNavigate(); // 🔹 Hook para redirigir al login
 
-  const handleButtonClick = () => {
-    console.log("Botón de acción clickeado");
-    // Aquí puedes agregar una acción como navegación o abrir un modal
+  const handleLogout = () => {
+    logout(); // 🔹 Cierra la sesión del usuario
+    navigate("/login"); // 🔹 Redirige al login
   };
 
   return (
     <LayoutContainer>
       <CssBaseline />
-      
+
       {/* Encabezado */}
       <StyledAppBar position="fixed" open={open}>
         <Toolbar>
           <IconButton onClick={() => setOpen(!open)}>
             <Menu />
           </IconButton>
-          <Typography variant="h6">Dashboard</Typography>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            Dashboard
+          </Typography>
 
-          {/* 🔹 Botón en el lado derecho */}
-          <Box sx={{ marginLeft: "auto" }}>
-            <Button variant="contained" color="primary" onClick={handleButtonClick}>
-              Acción
-            </Button>
-          </Box>
+          {/* 🔹 Botón de Cerrar sesión en la parte derecha */}
+          <Button
+            variant="contained"
+            color="error"
+            startIcon={<Logout />}
+            onClick={handleLogout}
+          >
+            Cerrar sesión
+          </Button>
         </Toolbar>
       </StyledAppBar>
 

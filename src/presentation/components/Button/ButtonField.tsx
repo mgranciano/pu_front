@@ -19,7 +19,7 @@ const ButtonField: React.FC<ButtonFieldProps> = ({
 }) => {
   return (
     <StyledButton
-      theme={theme}
+      $theme={theme} // Cambio de `theme` a `$theme`
       disabled={disabled}
       onClick={onClick}
       name={name}

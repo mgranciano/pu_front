@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../application/store";
 import { Navigate, Outlet } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   loginSuccess,
   checkingAuth,
@@ -18,13 +18,7 @@ const PrivateRoute = () => {
   const { user, isCheckingAuth } = useSelector(
     (state: RootState) => state.auth
   );
-
-  console.log(
-    "🔍 Estado de autenticación en PrivateRoute antes de validar:",
-    user,
-    "isCheckingAuth:",
-    isCheckingAuth
-  );
+  const [isValidated, setIsValidated] = useState(false);
 
   useEffect(() => {
     const validateToken = async () => {
@@ -33,7 +27,6 @@ const PrivateRoute = () => {
       const storedToken = localStorage.getItem("accessToken");
       if (!storedToken) {
         console.warn("⚠ No hay token almacenado, redirigiendo a login...");
-        dispatch(stopCheckingAuth());
         dispatch(logout());
         return;
       }
@@ -47,19 +40,17 @@ const PrivateRoute = () => {
 
         console.log("🔹 Respuesta de validación de token:", response);
 
-        if (response?.responseObject?.estatus === "E") {
-          console.warn("⚠ Token inválido o expirado, cerrando sesión...");
+        if (!response?.responseObject || response.responseObject.status !== "Ok") {
+          console.warn("⚠ Token expirado o inválido, cerrando sesión...");
           localStorage.removeItem("accessToken");
           dispatch(logout());
-        } else if (response?.responseObject?.estatus === "S") {
+        } else {
           console.log("✅ Token válido, restaurando sesión...");
 
           const user: User = {
-            id: response.responseObject.responseObject?.id ?? "default-id",
-            name: response.responseObject.responseObject?.name ?? "Usuario",
-            email:
-              response.responseObject.responseObject?.email ??
-              "email@example.com",
+            id: response.responseObject.id ?? "default-id",
+            name: response.responseObject.name ?? "Usuario",
+            email: response.responseObject.email ?? "email@example.com",
             accessToken: storedToken,
           };
 
@@ -71,30 +62,22 @@ const PrivateRoute = () => {
         dispatch(logout());
       } finally {
         dispatch(stopCheckingAuth());
+        setIsValidated(true);
       }
     };
 
-    if (!user) {
+    if (!user && !isCheckingAuth) {
       validateToken();
+    } else {
+      setIsValidated(true);
     }
-  }, [dispatch, user]);
+  }, [dispatch, user, isCheckingAuth]);
 
-  console.log(
-    "🔍 Estado de autenticación en PrivateRoute después de validar:",
-    user,
-    "isCheckingAuth:",
-    isCheckingAuth
-  );
-
-  if (isCheckingAuth) {
-    return null; // 🔹 Esperar a que termine la validación antes de redirigir
+  if (!isValidated) {
+    return null;
   }
 
-  return user ? (
-    <Outlet />
-  ) : (
-    <Navigate to="/login" state={{ message: "Sesión expirada" }} replace />
-  );
+  return user ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
 export default PrivateRoute;

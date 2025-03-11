@@ -8,18 +8,20 @@ import {
   serverDown,
   checkingAuth,
   stopCheckingAuth,
-  logout,
+  logout as logoutAction,
   loginFailure,
   loginRequest,
 } from "../reducers/authSlice";
 import { User } from "../../domain/interfaces/IAuth";
 import { AuthService } from "../../infrastructure/services/AuthServices";
+import { useNavigate } from "react-router-dom"; // 🔹 Importamos useNavigate para redirigir
 
 const apiService = new ApiService();
 const authService = new AuthService(apiService);
 
 export const useAuth = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate(); // 🔹 Hook de React Router para navegación
   const state = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
@@ -50,7 +52,7 @@ export const useAuth = () => {
       const token = localStorage.getItem("accessToken");
       if (!token) {
         console.warn("⚠ No hay token almacenado, cerrando sesión...");
-        dispatch(stopCheckingAuth());
+        logout();
         return;
       }
 
@@ -65,8 +67,7 @@ export const useAuth = () => {
 
         if (!response?.responseObject) {
           console.warn("⚠ Respuesta inesperada, cerrando sesión...");
-          localStorage.removeItem("accessToken");
-          dispatch(logout());
+          logout();
           return;
         }
 
@@ -74,8 +75,7 @@ export const useAuth = () => {
 
         if (status === "Token expirado o inválido") {
           console.warn("⚠ Token expirado o inválido, cerrando sesión...");
-          localStorage.removeItem("accessToken");
-          dispatch(logout());
+          logout();
           return;
         }
 
@@ -92,12 +92,11 @@ export const useAuth = () => {
           dispatch(loginSuccess(user));
         } else {
           console.warn("⚠ Estado inesperado en la validación del token.");
-          dispatch(logout());
+          logout();
         }
       } catch (error) {
         console.error("❌ Error al validar token:", error);
-        localStorage.removeItem("accessToken");
-        dispatch(logout());
+        logout();
       } finally {
         dispatch(stopCheckingAuth());
       }
@@ -138,5 +137,16 @@ export const useAuth = () => {
     }
   };
 
-  return { ...state, login };
+  const logout = () => {
+    console.log("🚪 Cerrando sesión...");
+    localStorage.removeItem("accessToken");
+    const rememberedEmail = localStorage.getItem("rememberedEmail");
+    if (!rememberedEmail) {
+      localStorage.removeItem("rememberedEmail");
+    }
+    dispatch(logoutAction());
+    navigate("/login");
+  };
+
+  return { ...state, login, logout };
 };

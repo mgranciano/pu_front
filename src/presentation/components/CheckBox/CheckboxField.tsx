@@ -23,8 +23,10 @@ const CheckboxField: React.FC<CheckboxProps> = ({
 }) => {
   return (
     <CheckboxContainer>
+      {/* Input real, pero oculto */}
       <HiddenCheckbox name={name} checked={checked} onChange={onChange} />
-      <StyledCheckbox checked={checked} style={style} />
+      {/* Checkbox estilizado */}
+      <StyledCheckbox $checked={checked} style={style} />
       <span style={{ marginLeft: "8px" }}>{label}</span>
     </CheckboxContainer>
   );

@@ -55,10 +55,10 @@ const InputField: React.FC<InputFieldProps> = ({
       <LabelField
         level={labelLevel}
         text={label}
-        bold={labelBold}
+        $bold={labelBold}
         color={error ? "#d32f2f" : "#000"}
       />
-      <InputContainer error={error}>
+      <InputContainer $error={error}>
         {icon && <Icon>{icon}</Icon>}
         <StyledInput
           type={type === "password" && !isPasswordVisible ? "password" : "text"}

@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const StyledButton = styled.button<{
-  theme: string;
+  $theme: string; // Cambio de `theme` a `$theme`
   disabled?: boolean;
 }>`
   font-family: "Roboto", sans-serif;
@@ -23,29 +23,29 @@ export const StyledButton = styled.button<{
   margin-bottom: 5px;
   margin-right: 5px;
 
-  ${({ theme, disabled }) =>
-    theme === "TemaAzul" &&
+  ${({ $theme, disabled }) =>
+    $theme === "TemaAzul" &&
     `
       background: ${disabled ? "#A5C7ED" : "#1D74D3"};
       &:hover { background: ${disabled ? "#A5C7ED" : "#175DA9"}; }
     `}
 
-  ${({ theme, disabled }) =>
-    theme === "TemaNegro" &&
+  ${({ $theme, disabled }) =>
+    $theme === "TemaNegro" &&
     `
       background: ${disabled ? "#C2C5C8" : "#343D48"};
       &:hover { background: ${disabled ? "#C2C5C8" : "#000E15"}; }
     `}
 
-  ${({ theme, disabled }) =>
-    theme === "TemaNaranja" &&
+  ${({ $theme, disabled }) =>
+    $theme === "TemaNaranja" &&
     `
       background: ${disabled ? "#F48883" : "#EC3931"};
       &:hover { background: ${disabled ? "#F48883" : "#D4332C"}; }
     `}
 
-  ${({ theme, disabled }) =>
-    theme === "TemaClaro" &&
+  ${({ $theme, disabled }) =>
+    $theme === "TemaClaro" &&
     `
       background: ${disabled ? "#fff" : "#fff"};
       color: ${disabled ? "#A5C7ED" : "#1D74D3"};

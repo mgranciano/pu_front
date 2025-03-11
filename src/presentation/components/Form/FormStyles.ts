@@ -4,9 +4,9 @@ export const StyledForm = styled.form`
   padding: 10px;
   width: 100%;
   max-width: 500px;
-  border: none !important;
-  box-shadow: none !important;
-  background-color: transparent !important;
+  border: none;
+  box-shadow: none;
+  background-color: transparent;
   display: flex;
   flex-direction: column;
   align-items: stretch;

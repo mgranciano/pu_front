@@ -10,8 +10,13 @@ interface FormFieldProps {
 }
 
 const FormField: React.FC<FormFieldProps> = ({ children, onSubmit, style }) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault(); // 🚀 Evita la recarga de la página
+    if (onSubmit) onSubmit(event);
+  };
+
   return (
-    <StyledForm onSubmit={onSubmit} style={style}>
+    <StyledForm as="form" onSubmit={handleSubmit} style={style}>
       {children}
     </StyledForm>
   );

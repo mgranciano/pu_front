@@ -27,15 +27,26 @@ import { RootState } from "../../../application/store";
 
 const LoginPage = () => {
   const { isLoading, login, error, isServerDown } = useAuth();
-  const [form, setForm] = useState({ email: "", password: "" });
-  const [errors, setErrors] = useState({ email: "", password: "" });
-  const [isChecked, setIsChecked] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // 🔹 Intenta recuperar el email si está guardado
+  const storedEmail = localStorage.getItem("rememberedEmail") ?? "";
+
+  const [form, setForm] = useState({
+    email: storedEmail,
+    password: "",
+  });
+
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [isChecked, setIsChecked] = useState(storedEmail !== ""); // 🔹 Si hay un email, marca la casilla por defecto
   const [authError, setAuthError] = useState<string | null>(null);
 
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const user = useSelector((state: RootState) => state.auth.user); // ✅ Accede correctamente
+  const user = useSelector((state: RootState) => state.auth.user);
   console.log("🟢 Usuario autenticado:", user);
 
   useEffect(() => {
@@ -61,10 +72,21 @@ const LoginPage = () => {
     }));
   };
 
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsChecked(e.target.checked);
+  };
+
   const handleSubmit = async () => {
     setAuthError(null);
     const success = await login(form.email, form.password);
+
     if (success) {
+      if (isChecked) {
+        localStorage.setItem("rememberedEmail", form.email);
+      } else {
+        localStorage.removeItem("rememberedEmail");
+      }
+
       navigate("/dashboard");
     } else {
       setAuthError("Error en la autenticación, revisa tus credenciales.");
@@ -123,7 +145,7 @@ const LoginPage = () => {
                 <LabelField
                   level="h4"
                   text="Iniciar sesión"
-                  bold={true}
+                  $bold={true}
                   style={{ marginBottom: "0px" }}
                 />
 
@@ -157,7 +179,7 @@ const LoginPage = () => {
                           ? "Error de conexión con el servidor, intenta más tarde."
                           : (error ?? authError ?? "")
                       }
-                      bold={true}
+                      $bold={true}
                       color={"#EC3931"}
                     />
                   </div>
@@ -168,7 +190,7 @@ const LoginPage = () => {
                     name="recordarUsuario"
                     label="Recordar usuario"
                     checked={isChecked}
-                    onChange={(e) => setIsChecked(e.target.checked)}
+                    onChange={handleCheckboxChange}
                   />
                   <TextLinkField
                     text="Olvidé mi contraseña"
@@ -196,28 +218,6 @@ const LoginPage = () => {
           </Grid>
         </Grid>
       </motion.div>
-      <div
-        style={{
-          position: "fixed",
-          bottom: "10px",
-          right: "100px",
-          width: "100%",
-          display: "flex",
-          justifyContent: "flex-end",
-          zIndex: 10,
-        }}
-      >
-        <LabelField
-          level="p"
-          text="2024 © Exagono Software"
-          bold={false}
-          color="background: #343D48"
-          style={{
-            fontSize: "14px",
-            letterSpacing: "2%",
-          }}
-        />
-      </div>
     </>
   );
 };

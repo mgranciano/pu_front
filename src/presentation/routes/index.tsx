@@ -8,13 +8,13 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
 
-      {/* 🔹 Protegemos la ruta dashboard con PrivateRoute */}
+      {/* 🔹 Rutas protegidas con PrivateRoute */}
       <Route element={<PrivateRoute />}>
         <Route path="/dashboard" element={<Dashboard />} />
       </Route>
 
-      {/* 🔹 Si la ruta no existe, redirige a login */}
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      {/* 🔹 Redirección si la ruta no existe */}
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
 };
